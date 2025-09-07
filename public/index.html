@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BolivarAI Chat</title>
+</head>
+<body>
+  <h1>BolivarAI</h1>
+  <textarea id="prompt" rows="4" cols="50" placeholder="Escribe tu mensaje..."></textarea>
+  <br><br>
+  <button onclick="sendMessage()">Enviar</button>
+  <pre id="response"></pre>
+
+  <script>
+    async function sendMessage() {
+      const message = document.getElementById("prompt").value;
+      const resBox = document.getElementById("response");
+      resBox.textContent = "Cargando...";
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message })
+        });
+
+        if (!res.ok) {
+          const text = await res.text();
+          resBox.textContent = `Error: ${res.status}\n${text}`;
+          return;
+        }
+
+        const data = await res.json();
+        resBox.textContent = data.reply;
+      } catch (err) {
+        resBox.textContent = "Error al conectar con el servidor.";
+      }
+    }
+  </script>
+</body>
+</html>
